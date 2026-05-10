@@ -4,8 +4,9 @@ from pathlib import Path
 import re
 import pandas as pd
 
-DATA_DIR = Path(__file__).parent.parent.parent
-CSV_PATH = DATA_DIR / "dataset_elpino.csv"
+PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
+DB_DIR = Path(__file__).parent.parent / "data" / "chroma_db"
+CSV_PATH = PROJECT_ROOT / "dataset_elpino.csv"
 
 df_clinical = pd.read_csv(CSV_PATH, sep=";", on_bad_lines="skip")
 
@@ -442,7 +443,7 @@ def get_real_stats(patient_data_or_codes):
 
 
 def get_retriever():
-    client = chromadb.PersistentClient(path=str(DATA_DIR / "backend" / "data" / "chroma_db"))
+    client = chromadb.PersistentClient(path=str(DB_DIR))
     return client.get_collection("hospital_elpino")
 
 

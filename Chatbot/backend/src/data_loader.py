@@ -5,13 +5,14 @@ import json
 import os
 from pathlib import Path
 
-DATA_DIR = Path(__file__).parent.parent.parent
+PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
+DB_DIR = Path(__file__).parent.parent / "data" / "chroma_db"
 
 def load_datasets():
-    cie10 = pd.read_excel(DATA_DIR / "CIE-10.xlsx")
-    cie9 = pd.read_excel(DATA_DIR / "CIE-9.xlsx")
-    grd = pd.read_excel(DATA_DIR / "IR-GRD V3.1 CON PRECIOS FONASA 2016.xlsx")
-    elpino = pd.read_csv(DATA_DIR / "dataset_elpino.csv", sep=';', on_bad_lines='skip')
+    cie10 = pd.read_excel(PROJECT_ROOT / "CIE-10.xlsx")
+    cie9 = pd.read_excel(PROJECT_ROOT / "CIE-9.xlsx")
+    grd = pd.read_excel(PROJECT_ROOT / "IR-GRD V3.1 CON PRECIOS FONASA 2016.xlsx")
+    elpino = pd.read_csv(PROJECT_ROOT / "dataset_elpino.csv", sep=';', on_bad_lines='skip')
     return cie10, cie9, grd, elpino
 
 def extract_codes_from_diagnosis(diag_str):
@@ -77,7 +78,7 @@ def create_rag_documents(cie10, cie9, grd, elpino):
     return documents, ids, metadatas
 
 def create_vector_store(documents, ids, metadatas):
-    client = chromadb.PersistentClient(path=str(DATA_DIR / "backend" / "data" / "chroma_db"))
+    client = chromadb.PersistentClient(path=str(DB_DIR))
     
     try:
         client.delete_collection("hospital_elpino")

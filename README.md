@@ -11,21 +11,31 @@ Asistente de gestión y clasificación de camas del Hospital El Pino, utilizando
 ## Estructura del Proyecto
 
 ```
-ChatBoot/
-├── backend/
-│   ├── src/
-│   │   ├── data_loader.py    # Carga y procesa datasets
-│   │   ├── llm_setup.py      # Configuración RAG + LLM
-│   │   └── main.py           # API FastAPI
-│   ├── data/                 # ChromaDB (se crea automáticamente)
-│   └── requirements.txt
-├── frontend/
-│   ├── src/
-│   │   ├── layouts/
-│   │   └── pages/
-│   ├── astro.config.mjs
-│   └── package.json
-└── *.xlsx, *.csv             # Datasets clínicos
+proyecto1AM/
+├── Chatbot/
+│   ├── backend/
+│   │   ├── data/                 # Carpeta para ChromaDB (ahora ignorada en Git)
+│   │   ├── src/
+│   │   │   ├── data_loader.py    # Carga y procesa datasets (apunta a la raíz)
+│   │   │   ├── llm_setup.py      # Configuración RAG + LLM
+│   │   │   └── main.py           # API FastAPI
+│   │   ├── venv/                 # Entorno virtual de Python
+│   │   └── requirements.txt      # Dependencias del backend
+│   └── frontend/
+│       ├── src/
+│       │   ├── layouts/
+│       │   └── pages/
+│       ├── astro.config.mjs
+│       └── package.json
+├── Graficos/                     # Carpetas adicionales de análisis
+├── Informes/
+├── modelos_exportados/
+├── video-chatbot/
+├── Proyecto1.ipynb               # Notebooks
+├── analisis_base.ipynb
+├── README.md
+├── requirements.txt              # Dependencias a nivel raíz
+└── *.xlsx, *.csv                 # Datasets clínicos (CIE-10, CIE-9, GRD, dataset_elpino)
 ```
 
 ## Instalación y Ejecución
