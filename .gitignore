@@ -2,3 +2,7 @@
 __pycache__/
 .DS_Store
 modelos_exportados/
+Chatbot/backend/data/chroma_db/
+Chatbot/backend/data/chroma_db/
+Chatbot/backend/data/chroma_db/
+Chatbot/backend/data/chroma_db/

@@ -1,0 +1,423 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="El Pino Assistant">
+  <div class="h-screen w-full flex bg-[#0a0a0b] overflow-hidden relative">
+    
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="absolute top-0 left-1/4 w-[600px] h-[400px] bg-teal-500/3 rounded-full blur-[120px]"></div>
+      <div class="absolute bottom-0 right-1/4 w-[500px] h-[300px] bg-emerald-500/2 rounded-full blur-[100px]"></div>
+    </div>
+
+    <aside id="sidebar" class="w-72 flex flex-col border-r border-white/[0.06] flex-shrink-0 transition-all duration-300 -translate-x-full lg:translate-x-0 absolute lg:relative z-20 h-full">
+      <div class="p-4 border-b border-white/[0.06]">
+        <button
+          id="new-chat-btn"
+          class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-br from-teal-500/20 to-emerald-500/10 hover:from-teal-500/30 hover:to-emerald-500/20 border border-teal-500/20 text-teal-400 font-medium text-sm transition-all duration-200 hover:shadow-[0_0_20px_rgba(20,184,166,0.3)]"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Nuevo Chat
+        </button>
+      </div>
+      
+      <div class="flex-1 overflow-y-auto p-3">
+        <p class="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-3 px-2">Historial</p>
+        <div id="chat-history-list" class="space-y-1">
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-white/[0.06]">
+        <div class="flex items-center gap-3 px-2">
+          <div class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center">
+            <span class="text-xs font-medium text-zinc-400">EP</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm text-zinc-300 truncate">Usuario</p>
+            <p class="text-[11px] text-zinc-500">Hospital El Pino</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col min-w-0 lg:border-l lg:border-white/[0.06]">
+      <header class="h-16 flex items-center justify-between px-4 lg:px-6 border-b border-white/[0.06] flex-shrink-0 relative z-10">
+        <div class="flex items-center gap-3">
+          <button
+            id="toggle-sidebar"
+            class="lg:hidden p-2 rounded-lg hover:bg-zinc-800/50 text-zinc-400"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-500/20 to-emerald-500/10 border border-teal-500/20 flex items-center justify-center">
+              <svg class="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-lg font-medium text-zinc-100 tracking-tight font-[family-name:var(--font-Outfit)]">El Pino Assistant</h1>
+              <p class="text-[11px] text-zinc-500 uppercase tracking-widest">Gestión de Camas</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900/50 border border-white/[0.06]">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
+          <span class="text-xs text-zinc-400 font-medium">Local LLM</span>
+        </div>
+      </header>
+
+      <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <div id="chat-container" class="flex-1 overflow-y-auto px-6 py-8 space-y-6">
+          <div class="flex justify-start animate-fade-in-up" style="animation-delay: 0s;">
+            <div class="max-w-[85%] lg:max-w-[70%]">
+              <div class="text-zinc-200 text-[15px] leading-relaxed">
+                <p class="mb-3">Hola. Soy el asistente de gestión de camas del Hospital El Pino. Puedo ayudarte a:</p>
+                <ul class="list-disc pl-5 mb-3 space-y-1.5 text-zinc-400">
+                  <li>Clasificar pacientes (cama médica vs quirúrgica)</li>
+                  <li>Consultar códigos ICD-10/ICD-9</li>
+                  <li>Obtener información de GRDs</li>
+                  <li>Estimar probabilidades clínicas</li>
+                </ul>
+                <p class="text-zinc-400">¿En qué puedo ayudarte?</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex-shrink-0 px-6 pb-6 pt-2">
+          <div class="max-w-[85%] lg:max-w-[70%] mx-auto">
+            <div class="glass rounded-2xl p-1.5">
+              <div class="relative flex items-center gap-2">
+                <input
+                  type="text"
+                  id="user-input"
+                  class="w-full bg-transparent border-0 px-4 py-3 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-0"
+                  placeholder="Escribe tu mensaje..."
+                  autocomplete="off"
+                />
+                <button
+                  id="send-btn"
+                  class="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500/20 to-emerald-500/10 hover:from-teal-500/30 hover:to-emerald-500/20 border border-teal-500/20 text-teal-400 flex items-center justify-center transition-all duration-200 hover:shadow-[0_0_20px_rgba(20,184,166,0.3)]"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <p class="text-[11px] text-zinc-600 mt-2 text-center">Presiona Enter para enviar</p>
+          </div>
+        </main>
+      </main>
+    </div>
+
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-10 lg:hidden hidden"></div>
+  </div>
+
+  <script is:inline>
+    const API_URL = 'http://localhost:8000';
+    const MAX_MESSAGES_PER_CHAT = 20;
+    const MAX_CHATS_STORED = 10;
+    
+    let currentChatId = null;
+    let chats = {};
+
+    const chatContainer = document.getElementById('chat-container');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+    const newChatBtn = document.getElementById('new-chat-btn');
+    const toggleSidebarBtn = document.getElementById('toggle-sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+    function loadChats() {
+      const saved = localStorage.getItem('elpino_chats');
+      if (saved) {
+        chats = JSON.parse(saved);
+      }
+    }
+
+    function saveChats() {
+      Object.values(chats).forEach(chat => {
+        if (chat.messages.length > MAX_MESSAGES_PER_CHAT) {
+          chat.messages = chat.messages.slice(-MAX_MESSAGES_PER_CHAT);
+        }
+      });
+
+      const chatArray = Object.values(chats).sort((a, b) => 
+        new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      if (chatArray.length > MAX_CHATS_STORED) {
+        const toDelete = chatArray.slice(MAX_CHATS_STORED).map(c => c.id);
+        toDelete.forEach(id => delete chats[id]);
+      }
+
+      localStorage.setItem('elpino_chats', JSON.stringify(chats));
+    }
+
+    function generateChatId() {
+      return 'chat_' + Date.now();
+    }
+
+    function createNewChat() {
+      const chatId = generateChatId();
+      currentChatId = chatId;
+      chats[chatId] = {
+        id: chatId,
+        title: 'Nuevo Chat',
+        messages: [],
+        createdAt: new Date().toISOString()
+      };
+      saveChats();
+      renderChatHistory();
+      clearChat();
+      closeSidebarMobile();
+    }
+
+    function loadChat(chatId) {
+      currentChatId = chatId;
+      const chat = chats[chatId];
+      if (chat) {
+        renderMessages(chat.messages);
+      }
+      renderChatHistory();
+      closeSidebarMobile();
+    }
+
+    function updateChatTitle(chatId, firstMessage) {
+      if (chats[chatId] && chats[chatId].title === 'Nuevo Chat') {
+        const title = firstMessage.length > 30 ? firstMessage.substring(0, 30) + '...' : firstMessage;
+        chats[chatId].title = title;
+        saveChats();
+        renderChatHistory();
+      }
+    }
+
+    function clearChat() {
+      const chatContainer = document.getElementById('chat-container');
+      chatContainer.innerHTML = `
+        <div class="flex justify-start animate-fade-in-up">
+          <div class="max-w-[85%] lg:max-w-[70%]">
+            <div class="text-zinc-200 text-[15px] leading-relaxed">
+              <p class="mb-3">Hola. Soy el asistente de gestión de camas del Hospital El Pino. Puedo ayudarte a:</p>
+              <ul class="list-disc pl-5 mb-3 space-y-1.5 text-zinc-400">
+                <li>Clasificar pacientes (cama médica vs quirúrgica)</li>
+                <li>Consultar códigos ICD-10/ICD-9</li>
+                <li>Obtener información de GRDs</li>
+                <li>Estimar probabilidades clínicas</li>
+              </ul>
+              <p class="text-zinc-400">¿En qué puedo ayudarte?</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMessages(messages) {
+      const chatContainer = document.getElementById('chat-container');
+      
+      clearChat();
+      
+      messages.forEach((msg, index) => {
+        if (msg.role === 'user') {
+          chatContainer.appendChild(createUserMessage(msg.content, index * 0.1));
+        } else {
+          chatContainer.appendChild(createBotMessage(msg.content, index * 0.1));
+        }
+      });
+      
+      scrollToBottom();
+    }
+
+    function renderChatHistory() {
+      const list = document.getElementById('chat-history-list');
+      const chatArray = Object.values(chats).sort((a, b) => 
+        new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      
+      if (chatArray.length === 0) {
+        list.innerHTML = '<p class="text-sm text-zinc-600 px-2">No hay chats aún</p>';
+        return;
+      }
+      
+      list.innerHTML = chatArray.map(chat => `
+        <button
+          onclick="loadChat('${chat.id}')"
+          class="chat-item w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
+            currentChatId === chat.id 
+              ? 'bg-gradient-to-r from-teal-500/10 to-transparent text-zinc-100 border-l-2 border-teal-500' 
+              : 'text-zinc-400 hover:bg-zinc-700/50 hover:text-zinc-200'
+          }"
+        >
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+            </svg>
+            <span class="truncate">${chat.title}</span>
+          </div>
+        </button>
+      `).join('');
+    }
+
+    function closeSidebarMobile() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      sidebar.classList.add('-translate-x-full');
+      overlay.classList.add('hidden');
+    }
+
+    function openSidebarMobile() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      sidebar.classList.remove('-translate-x-full');
+      overlay.classList.remove('hidden');
+    }
+
+    loadChats();
+    renderChatHistory();
+
+    if (Object.keys(chats).length > 0) {
+      const chatArray = Object.values(chats).sort((a, b) => 
+        new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      const lastChat = chatArray[0];
+      if (lastChat && lastChat.id) {
+        currentChatId = lastChat.id;
+        renderMessages(lastChat.messages);
+      }
+    }
+
+    newChatBtn.addEventListener('click', createNewChat);
+    toggleSidebarBtn.addEventListener('click', openSidebarMobile);
+    sidebarOverlay.addEventListener('click', closeSidebarMobile);
+
+    function createUserMessage(message, delay = 0) {
+      const div = document.createElement('div');
+      div.className = 'flex justify-end animate-fade-in-up';
+      div.style.animationDelay = delay + 's';
+      div.innerHTML = `
+        <div class="max-w-[85%] lg:max-w-[70%]">
+          <div class="bg-gradient-to-br from-zinc-800/80 to-zinc-800/40 text-zinc-100 text-[15px] leading-relaxed px-4 py-3 rounded-2xl rounded-tr-sm border border-white/[0.08]">
+            ${escapeHtml(message)}
+          </div>
+        </div>
+      `;
+      return div;
+    }
+
+    function createBotMessage(message, delay = 0) {
+      const div = document.createElement('div');
+      div.className = 'flex justify-start animate-fade-in-up';
+      div.style.animationDelay = delay + 's';
+      div.innerHTML = `
+        <div class="max-w-[85%] lg:max-w-[70%]">
+          <div class="text-zinc-200 text-[15px] leading-relaxed">
+            ${message}
+          </div>
+        </div>
+      `;
+      return div;
+    }
+
+    function createLoadingMessage() {
+      const div = document.createElement('div');
+      div.className = 'flex justify-start animate-fade-in-up';
+      div.id = 'loading-message';
+      div.innerHTML = `
+        <div class="max-w-[85%] lg:max-w-[70%]">
+          <div class="text-zinc-500 text-sm">
+            <span class="inline-flex items-center gap-2">
+              <span class="w-1.5 h-1.5 bg-zinc-600 rounded-full animate-pulse"></span>
+              <span class="animate-pulse">Escribiendo...</span>
+            </span>
+          </div>
+        </div>
+      `;
+      return div;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    async function sendMessage() {
+      const message = userInput.value.trim();
+      if (!message) return;
+
+      if (!currentChatId) {
+        createNewChat();
+      }
+
+      chatContainer.appendChild(createUserMessage(message));
+      userInput.value = '';
+
+      if (chats[currentChatId].title === 'Nuevo Chat') {
+        updateChatTitle(currentChatId, message);
+      }
+
+      chats[currentChatId].messages.push({ role: 'user', content: message });
+      saveChats();
+      renderChatHistory();
+
+      const chatHistory = chats[currentChatId].messages.slice(0, -1).map(m => ({
+        role: m.role,
+        content: m.content
+      }));
+
+      const loadingMsg = createLoadingMessage();
+      chatContainer.appendChild(loadingMsg);
+      scrollToBottom();
+
+      try {
+        const response = await fetch(`${API_URL}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: message, history: chatHistory })
+        });
+
+        const data = await response.json();
+        loadingMsg.remove();
+
+        chatContainer.appendChild(createBotMessage(data.answer));
+        chats[currentChatId].messages.push({ role: 'assistant', content: data.answer });
+        saveChats();
+      } catch (error) {
+        loadingMsg.remove();
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'flex justify-start';
+        errorDiv.innerHTML = `
+          <div class="max-w-[85%] lg:max-w-[70%]">
+            <div class="bg-red-500/10 text-red-400 text-sm px-4 py-3 rounded-2xl border border-red-500/20">
+              Error de conexión. ¿Está el backend ejecutándose?
+            </div>
+          </div>
+        `;
+        chatContainer.appendChild(errorDiv);
+      }
+
+      scrollToBottom();
+    }
+
+    function scrollToBottom() {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    if (sendBtn) {
+      sendBtn.addEventListener('click', sendMessage);
+    }
+    if (userInput) {
+      userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+      });
+    }
+
+    window.loadChat = loadChat;
+  </script>
+</Layout>
